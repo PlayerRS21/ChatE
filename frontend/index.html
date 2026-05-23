@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ChatE</title>
+  <link rel="stylesheet" href="/css/styles.css?v=73" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ChatE" />
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar chat-sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <div class="brand-mark logo-mark"><img src="/assets/message-circle-lock.svg" alt="ChatE" /></div>
+          <div>
+            <h1>ChatE</h1>
+            <p>End-to-end encrypted chat</p>
+          </div>
+        </div>
+      </div>
+
+      <section id="authPanel" class="card auth-card">
+        <div class="tabs">
+          <button id="loginTab" class="tab active" type="button">Login</button>
+          <button id="registerTab" class="tab" type="button">Register</button>
+        </div>
+
+        <form id="loginForm" class="stack">
+          <label>Username or email
+            <input id="loginId" autocomplete="username" required />
+          </label>
+          <label>Password
+            <input id="loginPassword" type="password" autocomplete="current-password" required minlength="8" />
+          </label>
+          <label>Key passphrase <span class="muted">optional</span>
+            <input id="loginKeyPassphrase" type="password" autocomplete="off" minlength="8" placeholder="Enter once to unlock encrypted chats" />
+          </label>
+          <p class="hint">Login alone never decrypts old chats. Enter the key passphrase once, or use Unlock messages later. Reloads stay unlocked only during that login session.</p>
+          <label class="file-label">Import encrypted key before login
+            <input id="preLoginImportKeyInput" type="file" accept="application/json" />
+          </label>
+          <button class="primary" type="submit">Login</button>
+          <div class="auth-help-row">
+            <button id="showForgotUsernameBtn" class="small-btn" type="button">Forgot username?</button>
+            <button id="showPasswordResetBtn" class="small-btn" type="button">Forgot password?</button>
+          </div>
+          <div id="authRecoveryPanel" class="recovery-panel hidden">
+            <label>Email for username reminder
+              <input id="forgotUsernameEmail" type="email" autocomplete="email" />
+            </label>
+            <button id="forgotUsernameBtn" type="button" class="small-btn">Send username email</button>
+            <label>Username or email for password reset
+              <input id="passwordResetLogin" autocomplete="username" />
+            </label>
+            <button id="passwordResetStartBtn" type="button" class="small-btn">Send password reset email</button>
+            <label>Reset code from email
+              <input id="passwordResetToken" autocomplete="one-time-code" />
+            </label>
+            <label>New password
+              <input id="passwordResetNewPassword" type="password" autocomplete="new-password" minlength="8" />
+            </label>
+            <button id="passwordResetCompleteBtn" type="button" class="small-btn primary">Reset password</button>
+            <p class="hint">Password reset restores login only. Old encrypted chats still need your key package or a trusted device.</p>
+          </div>
+        </form>
+
+        <form id="registerForm" class="stack hidden">
+          <label>Username
+            <input id="regUsername" autocomplete="username" required minlength="3" />
+          </label>
+          <label>Email
+            <input id="regEmail" type="email" autocomplete="email" required />
+          </label>
+          <label>Display name
+            <input id="regDisplayName" autocomplete="name" />
+          </label>
+          <label>Password
+            <input id="regPassword" type="password" autocomplete="new-password" required minlength="8" />
+          </label>
+          <label>Key passphrase
+            <input id="regKeyPassphrase" type="password" autocomplete="off" required minlength="8" />
+          </label>
+          <p class="hint">This protects your encrypted private-key package. Lose it and old chats are unrecoverable.</p>
+          <button class="primary" type="submit">Create account</button>
+        </form>
+      </section>
+
+      <section id="userPanel" class="sidebar-panel hidden">
+        <div class="profile-card">
+          <div class="avatar" id="avatarBox">?</div>
+          <div class="profile-meta">
+            <strong id="currentName">Not logged in</strong>
+            <p id="currentHandle"></p>
+          </div>
+          <a class="icon-link" href="/settings" title="Settings" aria-label="Open settings">⚙</a>
+        </div>
+
+        <div class="sidebar-tools">
+          <button id="toggleSearchBtn" class="search-toggle" type="button">🔎 Search / new chat</button>
+        </div>
+
+        <div id="searchDrawer" class="search-card search-drawer hidden">
+          <div class="search-title-row">
+            <strong>Find people & chats</strong>
+            <button id="closeSearchBtn" type="button" class="small-btn">Close</button>
+          </div>
+          <label>Start a new chat
+            <div class="row compact-row">
+              <input id="peerUsername" placeholder="Search username, name, or email" autocomplete="off" />
+              <button id="findPeerBtn" type="button">Find</button>
+            </div>
+          </label>
+          <div id="userSearchResults" class="user-search-results hidden"></div>
+          <label>Filter inbox
+            <input id="conversationSearch" placeholder="Search name or username" />
+          </label>
+          <label>Local encrypted message search
+            <input id="globalMessageSearchInput" placeholder="Search decrypted messages stored on this browser" autocomplete="off" />
+          </label>
+          <div id="globalMessageSearchResults" class="user-search-results hidden"></div>
+          <button id="clearLocalSearchIndexBtn" type="button" class="small-btn danger-link">Clear local message search index</button>
+        </div>
+
+        <div class="conversation-section">
+          <div class="section-head">
+            <strong>Inbox</strong>
+            <button id="refreshChatsBtn" type="button" class="small-btn">Refresh</button>
+          </div>
+          <div id="conversationList" class="conversation-list">
+            <p class="hint">Incoming chats will appear here automatically.</p>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main chat-main">
+      <header class="topbar">
+        <div class="chat-peer">
+          <div class="avatar small" id="chatAvatar">E</div>
+          <div>
+            <h2 id="chatTitle">No chat selected</h2>
+            <p id="chatSubtitle">Select a chat or find a user to start encrypted messaging.</p>
+            <p id="presenceText" class="presence-line offline">offline</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="mobileInboxBtn" type="button" class="button-link mobile-inbox-btn">Inbox</button>
+          <button id="themeBtn" type="button" class="lock-icon-btn" title="Cycle theme" aria-label="Cycle theme">◐</button>
+          <button id="unlockBtn" type="button" class="lock-icon-btn" title="Lock / unlock messages" aria-label="Lock or unlock messages">🔒</button>
+          <div id="lockState" class="pill locked sr-only" aria-live="polite">Locked</div>
+          <div class="chat-menu-wrap">
+            <button id="chatMenuBtn" type="button" class="icon-menu-btn" aria-label="Open chat options" aria-haspopup="menu" aria-expanded="false">⋮</button>
+            <div id="chatMenu" class="chat-menu hidden" role="menu">
+              <button id="toggleMessageSearchBtn" data-chat-action="search" type="button" role="menuitem">Search</button>
+              <button id="verifyPeerKeyBtn" data-chat-action="verify" type="button" role="menuitem">Security info</button>
+              <button id="pinChatBtn" data-chat-action="pin" type="button" role="menuitem">Pin</button>
+              <button id="muteChatBtn" data-chat-action="mute" type="button" role="menuitem">Mute</button>
+              <button id="chatDisappearingBtn" data-chat-action="disappearing" type="button" role="menuitem">Disappearing messages</button>
+              <button id="blockPeerBtn" data-chat-action="block" type="button" class="danger-link" role="menuitem">Block</button>
+              <button id="reportPeerBtn" data-chat-action="report" type="button" class="danger-link" role="menuitem">Report</button>
+              <button id="deleteConversationBtn" data-chat-action="delete" type="button" class="danger-link" role="menuitem">Delete chat</button>
+              <a href="/settings" role="menuitem">Settings</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section id="securityBanner" class="security-banner hidden" aria-live="polite"></section>
+
+      <section id="replyBar" class="reply-bar hidden">
+        <div><strong>Replying</strong><span id="replyPreview">Message</span></div>
+        <button id="cancelReplyBtn" type="button" class="small-btn">Cancel</button>
+      </section>
+
+      <section id="messageSearchBar" class="message-search-bar hidden">
+        <input id="messageSearchInput" placeholder="Search loaded messages" autocomplete="off" />
+        <button id="clearMessageSearchBtn" type="button" class="small-btn">Clear</button>
+      </section>
+
+      <section id="messageList" class="messages empty">
+        <div class="empty-state hero-empty">
+          <div class="brand-mark large logo-mark"><img src="/assets/message-circle-lock.svg" alt="ChatE" /></div>
+          <h3>Private by default</h3>
+          <p>Messages are encrypted in your browser. The server stores encrypted payloads only.</p>
+        </div>
+      </section>
+
+      <div id="recordingTray" class="recording-tray hidden" aria-live="polite">
+        <div class="recording-orb"><span></span></div>
+        <div class="recording-meta">
+          <strong>Recording voice note</strong>
+          <span id="recordingTimer">00:00</span>
+        </div>
+        <div class="recording-wave" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <button id="cancelRecordingBtn" type="button" class="small-btn danger-link">Cancel</button>
+        <button id="sendRecordingBtn" type="button" class="primary small-btn">Send now</button>
+      </div>
+
+      <form id="composer" class="composer hidden">
+        <div id="smartSuggestTray" class="smart-suggest-tray hidden" aria-label="Emoji, sticker, and GIF suggestions"></div>
+        <div class="composer-input-wrap">
+          <textarea id="messageInput" rows="2" placeholder="Type encrypted message... Enter sends, Shift+Enter adds line"></textarea>
+          <div id="emojiPanel" class="emoji-panel hidden" aria-label="Emoji picker"></div>
+        </div>
+        <div id="uploadProgress" class="upload-progress hidden"><span></span><strong>0%</strong></div>
+        <input id="attachmentInput" type="file" class="hidden" accept="image/*,video/*,audio/*,.pdf,.txt,.zip,.json,.csv,.md,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.webp,.rar,.7z,.tar,.gz,.epub,.rtf" />
+        <button id="attachBtn" class="emoji-btn" type="button" title="Attach encrypted file">📎</button>
+        <button id="emojiBtn" class="emoji-btn" type="button" title="Emoji and stickers">😊</button>
+        <button id="gifBtn" class="emoji-btn gif-btn" type="button" title="Animated GIF stickers">GIF</button>
+        <button id="recordBtn" class="record-btn" type="button" title="Click to record encrypted voice note">🎙</button>
+        <button id="sendBtn" class="primary send-btn" type="submit">Send</button>
+      </form>
+    </main>
+  </div>
+
+
+  <div id="networkStatus" class="network-status hidden" role="status" aria-live="polite">
+    <span id="networkStatusText">Offline</span>
+    <button id="retryOutboxBtn" type="button" class="small-btn">Retry</button>
+  </div>
+
+  <div id="swUpdateBanner" class="pwa-update-banner hidden" role="status" aria-live="polite">
+    <span>New ChatE version is ready.</span>
+    <button id="applyUpdateBtn" type="button" class="small-btn primary">Refresh</button>
+    <button id="dismissUpdateBtn" type="button" class="small-btn">Later</button>
+  </div>
+
+
+  <div id="deviceApprovalToast" class="device-approval-toast hidden" role="status" aria-live="polite"></div>
+
+  <div id="deviceWaitingModal" class="modal hidden device-waiting-modal" role="dialog" aria-modal="true" aria-labelledby="deviceWaitingTitle">
+    <div class="modal-card card device-waiting-card">
+      <div class="card-title-row">
+        <h2 id="deviceWaitingTitle">Waiting for device confirmation</h2>
+      </div>
+      <p id="deviceWaitingText" class="hint">ChatE found another trusted device on this account. Confirm this login from that device.</p>
+      <div class="device-waiting-status">
+        <span class="pulse-dot"></span>
+        <strong id="deviceWaitingStatus">Waiting for accept/reject…</strong>
+      </div>
+      <div class="row actions-row reminder-actions">
+        <button id="lostOldDeviceBtn" class="primary" type="button">Lost old device / email</button>
+        <button id="checkDeviceApprovalBtn" type="button">Check again</button>
+        <button id="cancelPendingDeviceBtn" class="danger-link" type="button">Logout</button>
+      </div>
+      <p class="hint">Email confirmation allows this device to log in, but it does not recover old encrypted chats. Old chats still need security.json/key passphrase or trusted-device approval.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <div id="keyExportReminder" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="keyExportReminderTitle">
+    <div class="modal-card card key-reminder-card">
+      <div class="card-title-row">
+        <h2 id="keyExportReminderTitle">Export your ChatE security file</h2>
+      </div>
+      <p class="hint">ChatE prioritizes E2EE. If you lose this browser/device and do not have your encrypted key package, old messages cannot be recovered by email reset, server admin, or anyone else.</p>
+      <div class="row actions-row reminder-actions">
+        <button id="reminderExportKeyBtn" class="primary" type="button">Export security.json</button>
+        <button id="reminderLaterBtn" type="button">Remind me later</button>
+        <button id="reminderDismissBtn" type="button">I understand</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="publicProfileModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="publicProfileTitle">
+    <div class="modal-card card public-profile-card">
+      <div class="card-title-row">
+        <h2 id="publicProfileTitle">Profile</h2>
+        <button id="closePublicProfileBtn" type="button" class="small-btn">Close</button>
+      </div>
+      <div class="public-profile-head">
+        <div id="publicProfileAvatar" class="avatar xl">?</div>
+        <div>
+          <strong id="publicProfileName">—</strong>
+          <p id="publicProfileHandle" class="hint">—</p>
+        </div>
+      </div>
+      <div id="publicProfileFields" class="profile-field-list"></div>
+      <p class="hint">Only fields this user allows publicly are shown here.</p>
+    </div>
+  </div>
+
+
+  <script type="module" src="/js/app.js?v=73"></script>
+</body>
+</html>

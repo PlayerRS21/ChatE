@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ChatE Settings</title>
+  <link rel="stylesheet" href="/css/styles.css?v=73" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ChatE" />
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+</head>
+<body>
+  <div class="settings-shell">
+    <header class="settings-header card glass-card">
+      <div class="brand compact">
+        <div class="brand-mark logo-mark"><img src="/assets/message-circle-lock.svg" alt="ChatE" /></div>
+        <div>
+          <h1>Settings</h1>
+          <p>Account, encryption keys, privacy, appearance, and local data.</p>
+        </div>
+      </div>
+      <div class="row actions-row">
+        <a class="button-link" href="/">Back to chat</a>
+        <button id="logoutBtn" type="button">Logout</button>
+      </div>
+    </header>
+
+    <main class="settings-grid upgraded-settings">
+      <section class="card settings-card account-card">
+        <div class="card-title-row">
+          <h2>Account</h2>
+          <span class="badge-soft">Profile</span>
+        </div>
+        <p class="hint">Signed in as <strong id="settingsUser">Loading...</strong></p>
+        <div class="kv">
+          <span>Email</span><strong id="settingsEmail">—</strong>
+          <span>Email status</span><strong id="emailVerifiedStatus">—</strong>
+          <span>Last login</span><strong id="lastLogin">—</strong>
+          <span>Last activity</span><strong id="lastSeen">—</strong>
+        </div>
+        <form id="profileForm" class="stack tight divider-top">
+          <div class="avatar-editor-row">
+            <div id="profileAvatarPreview" class="avatar xl">?</div>
+            <div class="stack tight">
+              <label class="file-label">Choose profile picture
+                <input id="avatarFileInput" type="file" accept="image/png,image/jpeg,image/webp" />
+              </label>
+              <p class="hint">Pick an image, drag it into position, zoom, then save the cropped square avatar.</p>
+            </div>
+          </div>
+          <label>Display name
+            <input id="profileDisplayName" maxlength="80" placeholder="Your display name" />
+          </label>
+          <label>Bio
+            <textarea id="profileBio" rows="3" maxlength="280" placeholder="Short public bio"></textarea>
+          </label>
+          <div class="privacy-checks">
+            <strong>Public profile visibility</strong>
+            <label class="check-row"><input id="publicShowDisplayName" type="checkbox" /> <span>Show display name</span></label>
+            <label class="check-row"><input id="publicShowAvatar" type="checkbox" /> <span>Show profile picture</span></label>
+            <label class="check-row"><input id="publicShowBio" type="checkbox" /> <span>Show bio</span></label>
+            <label class="check-row"><input id="publicShowEmail" type="checkbox" /> <span>Show email address</span></label>
+            <label class="check-row"><input id="publicShowLastSeen" type="checkbox" /> <span>Show last seen</span></label>
+          </div>
+          <button class="primary" type="submit">Save profile & visibility</button>
+        </form>
+        <div id="emailVerificationRow" class="divider-top row actions-row">
+          <button id="sendVerificationEmailBtn" type="button">Send verification email</button>
+          <span class="hint">Email is used only for login recovery and verification.</span>
+        </div>
+      </section>
+
+      <section class="card settings-card">
+        <div class="card-title-row">
+          <h2>Security</h2>
+          <span class="badge-soft">Login</span>
+        </div>
+        <form id="passwordForm" class="stack tight">
+          <label>Current password
+            <input id="currentPassword" type="password" autocomplete="current-password" minlength="8" />
+          </label>
+          <label>New password
+            <input id="newPassword" type="password" autocomplete="new-password" minlength="8" />
+          </label>
+          <button type="submit">Change password</button>
+        </form>
+        <p class="hint divider-top">Changing login password does not recover old chats. Old chats need the encrypted key package and its key passphrase.</p>
+      </section>
+
+      <section class="card settings-card key-card">
+        <div class="card-title-row">
+          <h2>Encryption data sharing</h2>
+          <span class="badge-soft">E2EE</span>
+        </div>
+        <p class="hint">Export only encrypted key packages. Raw private keys are never exported. Importing restores old-chat access only with the matching passphrase.</p>
+        <div class="stack tight">
+          <button id="exportKeyBtn" type="button">Export active encrypted key package</button>
+          <label class="file-label">Import encrypted key package
+            <input id="importKeyInput" type="file" accept="application/json" />
+          </label>
+          <button id="resetKeyBtn" type="button">Reset encryption key for new chats</button>
+          <button id="clearLocalKeysBtn" type="button">Clear local key packages on this device</button>
+        </div>
+      </section>
+
+
+      <section class="card settings-card security-card">
+        <div class="card-title-row">
+          <h2>Security center</h2>
+          <span class="badge-soft">Hardening</span>
+        </div>
+        <p class="hint">Use this fingerprint to verify your active encryption identity. Warnings here are diagnostic: they explain what is missing instead of showing useless generic failures.</p>
+        <div class="kv security-kv">
+          <span>My safety fingerprint</span><strong id="myKeyFingerprint" class="fingerprint-box security-neutral">Loading…</strong>
+          <span>Local key package</span><strong id="localKeyStatus" class="security-neutral">Checking…</strong>
+          <span>Trusted browser cache</span><strong id="trustedCacheStatus" class="security-neutral">Checking…</strong>
+          <span>Key history</span><strong id="keyHistoryStatus" class="security-neutral">Checking…</strong>
+        </div>
+        <p id="securityCheckDetails" class="hint security-details">Checking this browser and account security state…</p>
+        <div class="row actions-row">
+          <button id="copyFingerprintBtn" type="button">Copy fingerprint</button>
+          <button id="runSecurityCheckBtn" type="button">Run security check</button>
+          <button id="exportSecurityKeyShortcutBtn" type="button">Export key package</button>
+          <button id="importSecurityKeyShortcutBtn" type="button">Import key package</button>
+        </div>
+      </section>
+
+      <section class="card settings-card">
+        <div class="card-title-row">
+          <h2>Privacy retention</h2>
+          <span class="badge-soft">Deletion</span>
+        </div>
+        <p class="hint">If this account stays inactive beyond the selected interval, the backend deletes the account and encrypted data. Disappearing-message default applies to new outgoing messages only.</p>
+        <form id="autoDeleteForm" class="stack tight">
+          <label>Default disappearing messages
+            <select id="defaultDisappearingSeconds">
+              <option value="">Off</option>
+              <option value="30">30 seconds</option>
+              <option value="300">5 minutes</option>
+              <option value="3600">1 hour</option>
+              <option value="86400">1 day</option>
+              <option value="604800">7 days</option>
+              <option value="2592000">30 days</option>
+            </select>
+          </label>
+          <label>Delete after inactivity interval
+            <select id="autoDeleteAfterDays">
+              <option value="">Disabled</option>
+              <option value="7">7 days</option>
+              <option value="14">14 days</option>
+              <option value="30">30 days</option>
+              <option value="90">90 days</option>
+              <option value="180">180 days</option>
+              <option value="365">1 year</option>
+              <option value="730">2 years</option>
+            </select>
+          </label>
+          <button class="primary" type="submit">Save auto-deletion setting</button>
+        </form>
+      </section>
+
+      <section class="card settings-card">
+        <div class="card-title-row">
+          <h2>Appearance & notifications</h2>
+          <span class="badge-soft">UI</span>
+        </div>
+        <div class="stack tight">
+          <label>Theme
+            <select id="themeSelect">
+              <option value="system">System default</option>
+              <option value="dark">Dark mode</option>
+              <option value="light">Light mode</option>
+            </select>
+          </label>
+          <label class="check-row">
+            <input id="desktopNotifications" type="checkbox" />
+            <span>Background notifications for new messages</span>
+          </label>
+          <button id="testNotificationBtn" type="button">Send test notification</button>
+          <button id="installAppBtn" type="button">Install ChatE app</button>
+          <button id="checkPwaBtn" type="button">Check app/offline status</button>
+          <button id="clearShellCacheBtn" type="button" class="danger-link">Refresh offline cache</button>
+          <p id="pwaStatusText" class="hint">PWA status not checked yet.</p>
+          <p class="hint">Background notifications need browser permission, service worker support, and server VAPID keys. Notification Reply opens ChatE directly in the chat because web notifications do not provide a real inline text box.</p>
+          <label class="check-row">
+            <input id="compactMode" type="checkbox" />
+            <span>Compact chat layout</span>
+          </label>
+        </div>
+      </section>
+
+
+      <section class="card settings-card">
+        <div class="card-title-row">
+          <h2>Emoji, GIF & sticker packs</h2>
+          <span class="badge-soft">Local packs</span>
+        </div>
+        <p class="hint">Import your favorite GIFs, WebP/PNG/JPEG/SVG stickers, WebM/MP4 sticker clips, emoji images, or JSON packs. Packs are stored locally in IndexedDB, not localStorage, so the app can handle bigger collections without crashing the UI.</p>
+        <div class="stack tight">
+          <label class="file-label">Import GIF/sticker media
+            <input id="settingsPackMediaInput" type="file" accept="image/gif,image/webp,image/png,image/jpeg,image/svg+xml,video/webm,video/mp4" multiple />
+          </label>
+          <label class="file-label">Import JSON sticker pack
+            <input id="settingsPackJsonInput" type="file" accept="application/json" />
+          </label>
+          <label>Import third-party GIF/sticker URL
+            <div class="row compact-row">
+              <input id="settingsPackUrlInput" placeholder="https://example.com/sticker.gif" />
+              <button id="settingsPackUrlBtn" type="button">Import URL</button>
+            </div>
+          </label>
+          <button id="settingsClearPacksBtn" type="button" class="danger-link">Clear local packs</button>
+          <p id="settingsPackCount" class="hint">Loading pack count...</p>
+        </div>
+      </section>
+
+      <section class="card settings-card">
+        <div class="card-title-row">
+          <h2>Devices</h2>
+          <span class="badge-soft">Multi-device</span>
+        </div>
+        <p class="hint">Safe multi-device model: new devices can request a short-lived link; a trusted device approves by relaying the encrypted security package. The server never receives raw private keys or passphrases.</p>
+        <div id="devicesList" class="blocked-users-list"><p class="hint">Loading devices...</p></div>
+        <div class="row actions-row wrap">
+          <button id="registerThisDeviceBtn" type="button">Register this browser as a device</button>
+          <button id="startDeviceLinkBtn" type="button">Start device link request</button>
+          <button id="refreshDeviceLinksBtn" type="button">Refresh link requests</button>
+        </div>
+        <div id="deviceLinkBox" class="device-link-box hidden"></div>
+        <div id="pendingDeviceLinks" class="blocked-users-list divider-top"><p class="hint">No pending device links loaded.</p></div>
+        <p class="hint">QR payload/manual code fallback: copy the shown payload to your trusted device if camera scanning is unavailable. Full camera scanning can be added later without changing the backend protocol.</p>
+      </section>
+
+      <section class="card settings-card">
+        <div class="card-title-row">
+          <h2>Blocked users</h2>
+          <span class="badge-soft">Safety</span>
+        </div>
+        <p class="hint">Blocked users cannot message you and their conversations are hidden from your inbox.</p>
+        <div id="blockedUsersList" class="blocked-users-list">
+          <p class="hint">Loading blocked users...</p>
+        </div>
+      </section>
+
+      <section class="card settings-card danger-zone">
+        <div class="card-title-row">
+          <h2>Manual account deletion</h2>
+          <span class="badge-danger">Danger</span>
+        </div>
+        <p class="hint">This logs you out immediately. Login within 7 days to cancel. After 7 days, the account and encrypted messages are purged.</p>
+        <button id="deleteAccountBtn" class="danger" type="button">Request account deletion</button>
+      </section>
+    </main>
+  </div>
+
+  <div id="avatarCropModal" class="modal hidden">
+    <div class="modal-card card">
+      <div class="card-title-row">
+        <h2>Position profile picture</h2>
+        <button id="cancelCropBtn" type="button" class="small-btn">Cancel</button>
+      </div>
+      <div id="cropStage" class="crop-stage">
+        <img id="cropImage" alt="Avatar preview" />
+        <div class="crop-frame"></div>
+      </div>
+      <label>Zoom
+        <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" />
+      </label>
+      <div class="row actions-row">
+        <button id="saveAvatarBtn" class="primary" type="button">Save cropped avatar</button>
+        <button id="resetCropBtn" type="button">Reset position</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="/js/settings.js?v=73"></script>
+</body>
+</html>
